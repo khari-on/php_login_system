@@ -5,19 +5,30 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     include './partials/_dbconnect.php';
     $password=$_POST['password'];
     $email=$_POST['email'];
+
     
-$existSql="SELECT * FROM `client` WHERE email = '$email' AND password = '$password' ";
+    
+$existSql="SELECT * FROM `client` WHERE email = '$email'";
 $result = mysqli_query($conn,$existSql);
 $num = mysqli_num_rows($result);
 
 if($num == 1 ){
+    
+    
     $rows=mysqli_fetch_assoc($result);
-    $username=$rows['username'];
-    session_start();
-    $_SESSION['logedIn']=true;
-    $_SESSION['username']=$username;
+    if(password_verify($password,$rows['password'])){
+        $username=$rows['username'];
+        session_start();
+        $_SESSION['logedIn']=true;
+        $_SESSION['username']=$username;
+    
+      header('location:welcome.php');
 
-  header('location:welcome.php');
+    }else{
+    $invalidErr=true;
+        
+    };
+   
 }else{
     $invalidErr=true;
 }

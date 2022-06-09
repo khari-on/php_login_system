@@ -20,7 +20,8 @@ if($num == 1 ){
 }else{
 
     if($password==$cpassword){
-        $sql="INSERT INTO `client` ( `username`, `password`, `email`, `data`) VALUES ('$username', '$password', '$email', current_timestamp())";
+        $hasspassword=password_hash($password, PASSWORD_DEFAULT);
+        $sql="INSERT INTO `client` ( `username`, `password`, `email`, `data`) VALUES ('$username', '$hasspassword', '$email', current_timestamp())";
           $result= mysqli_query($conn,$sql);
     
             if($result){
