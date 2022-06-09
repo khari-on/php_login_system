@@ -1,35 +1,25 @@
 <?php
-$RegSuccess=false;
-$passErr=false;
-$userExit=false;
 
+$invalidErr = false;
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     include './partials/_dbconnect.php';
-
-    $username=$_POST['username'];
     $password=$_POST['password'];
-    $cpassword=$_POST['cpassword'];
     $email=$_POST['email'];
     
-$existSql="SELECT * FROM `client` WHERE email = '$email'";
+$existSql="SELECT * FROM `client` WHERE email = '$email' AND password = '$password' ";
 $result = mysqli_query($conn,$existSql);
 $num = mysqli_num_rows($result);
 
 if($num == 1 ){
-    $userExit=true;
-}else{
+    $rows=mysqli_fetch_assoc($result);
+    $username=$rows['username'];
+    session_start();
+    $_SESSION['logedIn']=true;
+    $_SESSION['username']=$username;
 
-    if($password==$cpassword){
-        $sql="INSERT INTO `client` ( `username`, `password`, `email`, `data`) VALUES ('$username', '$password', '$email', current_timestamp())";
-          $result= mysqli_query($conn,$sql);
-    
-            if($result){
-                 $RegSuccess=true;
-            };
-    
-    }else{
-        $passErr=true;
-    }
+  header('location:welcome.php');
+}else{
+    $invalidErr=true;
 }
 
 
@@ -50,42 +40,24 @@ if($num == 1 ){
   <body>
 
      <?php require './partials/_nav.php' ?>
-     <?php
-if($RegSuccess){
-    echo '  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>Success!</strong> You registered successfully 
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div> ';
-};
-
-if($userExit){
-    echo '  <div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <strong>Error!</strong> User All Ready Exits
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div> ';
-};
-
-
-if($passErr){
+    <?php
+     if($invalidErr){
     echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>Error!</strong> Your Password mis-matched 
+    <strong>Error!</strong> Invalid Credentials!
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>';
     
 };
-
 ?>
+
    
 
      <div class="container">
 
-     <h3 class="text-center">Register Here to Login In</h3>
+     <h3 class="text-center"> Login In</h3>
 
-     <form  action="./signup.php"  method='POST'>
-     <div class="mb-3">
-    <label for="exampleInputEmail1" class="form-label">UserName</label>
-    <input type="text" class="form-control" id="username" name="username" aria-describedby="emailHelp">
-  </div>
+     <form  action="./login.php"  method='POST'>
+    
   <div class="mb-3">
     <label for="exampleInputEmail1" class="form-label">Email address</label>
     <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp">
@@ -95,14 +67,9 @@ if($passErr){
     <input type="password" class="form-control" id="password" name="password">
   </div>
   <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">Conform Password</label>
-    <input type="password" class="form-control" id="cpassword" name="cpassword" name="password">
-    <div id="emailHelp" class="form-text">Password and conform password should be match</div>
-
-  </div>
-  <div class="mb-3">
   <button type="submit" class="btn btn-primary">Submit</button>
   </div>
+
 </form>
 
   </div>
